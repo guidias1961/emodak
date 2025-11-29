@@ -1,124 +1,109 @@
-/* RESET E FUNDO */
+/* --- FUNDO E ESTRUTURA GERAL --- */
 body {
     background-color: #000;
     font-family: 'Verdana', 'Arial', sans-serif;
+    font-size: 11px; /* Tamanho clássico da época */
     margin: 0;
     padding: 0;
-    /* Fundo roxo escuro sutil se a imagem falhar */
-    background-color: #1a0b2e; 
-    background-image: linear-gradient(#200052 1px, transparent 1px), linear-gradient(90deg, #200052 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/5/59/Monad_Logo_Purple.png'); 
+    background-repeat: repeat;
+    background-size: 50px;
+    color: #000;
 }
 
-/* CONTAINER PRINCIPAL */
+/* O "Papel" Branco Centralizado */
 .master-container {
-    width: 100%;
-    max-width: 800px; /* Limita a largura */
-    margin: 0 auto; /* Centraliza na tela */
+    width: 800px; /* Largura clássica de monitor 1024x768 */
+    margin: 15px auto;
     background-color: #ffffff;
     min-height: 100vh;
-    box-shadow: 0 0 20px rgba(131, 110, 249, 0.3);
+    border: 2px solid #200052; /* Borda Roxa Monad */
 }
 
-/* NAVBAR MONAD */
+/* --- NAVBAR --- */
 .monad-nav {
     background-color: #200052;
-    height: 40px;
+    height: 30px;
     display: flex;
     align-items: center;
-    padding: 0 15px;
+    padding: 0 10px;
     justify-content: space-between;
-    font-size: 12px;
     color: white;
 }
+.monad-nav a { color: white; text-decoration: none; margin: 0 5px; font-weight: bold; }
+.monad-nav a:hover { text-decoration: underline; }
 
-/* LAYOUT DE COLUNAS */
+/* --- GRID PRINCIPAL (2 Colunas) --- */
 .content-grid {
-    display: flex;
-    flex-wrap: wrap; /* Permite quebrar em mobile */
+    display: table; /* Hack old school para colunas iguais */
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.left-col { 
+.left-col {
     width: 300px;
-    padding: 15px; 
-    box-sizing: border-box;
-    text-align: center;
-}
-
-.right-col { 
-    flex: 1; /* Ocupa o resto do espaço */
+    vertical-align: top;
     padding: 15px;
-    min-width: 300px;
-    box-sizing: border-box;
+    background-color: #E5E5E5; /* Cinza clássico da lateral */
+    border-right: 1px solid #ccc;
 }
 
-/* COMPONENTES VISUAIS */
-.profile-pic-box {
-    border: 2px solid #000;
-    padding: 5px;
-    margin-bottom: 10px;
-    background: white;
+.right-col {
+    vertical-align: top;
+    padding: 15px;
+    background-color: #fff;
 }
-.profile-pic { width: 100%; height: auto; display: block; }
 
-.status-text { margin: 10px 0; font-size: 12px; }
+/* --- COMPONENTES DA ESQUERDA --- */
+.profile-name { font-size: 16px; font-weight: bold; margin-bottom: 10px; display: block; }
+
+.profile-pic-box { margin-bottom: 10px; }
+.profile-pic { width: 170px; height: auto; border: 2px solid #000; }
+
+.status-box { margin: 10px 0; }
 
 .contact-box {
     border: 1px solid #4393B8;
-    margin-top: 15px;
     background: white;
+    margin-top: 15px;
 }
-.contact-header { background-color: #6699CC; color: white; font-weight: bold; padding: 4px; font-size: 12px; text-align: left; }
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; font-size: 11px; text-align: left; padding: 5px; gap: 5px; }
+.contact-header { background-color: #6699CC; color: white; font-weight: bold; padding: 3px; }
+.contact-links { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; }
 
-.fake-link { color: #200052; cursor: pointer; text-decoration: underline; }
+/* --- COMPONENTES DA DIREITA --- */
+.network-banner {
+    border: 1px solid #000;
+    padding: 10px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
 
-/* CABEÇALHOS */
 .orange-header {
-    background-color: #836EF9;
+    background-color: #200052; /* Trocamos o laranja pelo Roxo Monad */
     color: #fff;
     font-weight: bold;
-    font-size: 13px;
-    padding: 4px 10px;
+    padding: 3px 10px;
     margin-top: 15px;
     margin-bottom: 5px;
-    text-align: left;
 }
 
-.blurb-text { font-size: 12px; line-height: 1.5; text-align: left; margin-bottom: 15px; color: #333; }
+.blurb-content { padding: 5px; margin-bottom: 15px; line-height: 1.4; }
 .section-label { color: #200052; font-weight: bold; }
 
-/* FRIEND GRID */
+/* --- GRID DE AMIGOS --- */
+.friend-count { color: #cc0000; font-weight: bold; font-size: 14px; }
 .friend-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 15px;
+    text-align: center;
     margin-top: 10px;
 }
-.friend-card { text-align: center; font-size: 10px; }
-.friend-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: 1px solid #ccc; }
+.friend-card img { width: 90px; height: 90px; object-fit: cover; border: 1px solid #ccc; }
 .friend-name { display: block; margin-bottom: 3px; color: #200052; font-weight: bold; }
 
-/* MODAL */
-.edit-panel {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #f0f0f0;
-    border: 3px solid #200052;
-    padding: 20px;
-    width: 90%;
-    max-width: 400px;
-    z-index: 1000;
-    box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
-}
-.edit-panel input, .edit-panel textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; padding: 5px; }
-.overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999;}
-
-.btn-retro {
-    background: linear-gradient(#fff, #ddd);
-    border: 1px solid #999;
-    cursor: pointer;
-    font-size: 11px;
-    padding: 4px 10px;
-}
+/* --- BOTÕES E EDIT --- */
+button { cursor: pointer; }
+.connect-btn { background: #fff; border: 1px solid #000; font-weight: bold; padding: 2px 5px; }

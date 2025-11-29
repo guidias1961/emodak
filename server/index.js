@@ -4,13 +4,7 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const app = express();
-
-// CORREÇÃO CRUCIAL: Liberar CORS para qualquer origem (MVP)
-app.use(cors({
-    origin: '*', 
-    methods: ['GET', 'POST']
-}));
-
+app.use(cors()); // Libera geral
 app.use(express.json());
 
 const pool = new Pool({
