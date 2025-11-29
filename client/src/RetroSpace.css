@@ -4,75 +4,91 @@ body {
     font-family: 'Verdana', 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); /* Textura sutil */
-    color: #000;
+    /* Fundo roxo escuro sutil se a imagem falhar */
+    background-color: #1a0b2e; 
+    background-image: linear-gradient(#200052 1px, transparent 1px), linear-gradient(90deg, #200052 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 /* CONTAINER PRINCIPAL */
 .master-container {
-    width: 800px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 800px; /* Limita a largura */
+    margin: 0 auto; /* Centraliza na tela */
     background-color: #ffffff;
     min-height: 100vh;
+    box-shadow: 0 0 20px rgba(131, 110, 249, 0.3);
 }
 
 /* NAVBAR MONAD */
 .monad-nav {
-    background-color: #200052; /* Monad Purple Dark */
-    height: 30px;
+    background-color: #200052;
+    height: 40px;
     display: flex;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 15px;
     justify-content: space-between;
-    font-size: 11px;
+    font-size: 12px;
     color: white;
 }
-.monad-nav a { color: white; text-decoration: none; margin: 0 5px; }
-.monad-nav a:hover { text-decoration: underline; }
 
-/* LAYOUT DE COLUNAS (CSS Grid imitando Tables) */
+/* LAYOUT DE COLUNAS */
 .content-grid {
-    display: grid;
-    grid-template-columns: 320px 480px;
-    gap: 0;
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar em mobile */
 }
 
-.left-col { padding: 15px; text-align: center; }
-.right-col { padding: 15px; }
+.left-col { 
+    width: 300px;
+    padding: 15px; 
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.right-col { 
+    flex: 1; /* Ocupa o resto do espaço */
+    padding: 15px;
+    min-width: 300px;
+    box-sizing: border-box;
+}
 
 /* COMPONENTES VISUAIS */
 .profile-pic-box {
     border: 2px solid #000;
     padding: 5px;
     margin-bottom: 10px;
+    background: white;
 }
-.profile-pic { width: 100%; max-width: 200px; }
+.profile-pic { width: 100%; height: auto; display: block; }
 
 .status-text { margin: 10px 0; font-size: 12px; }
 
 .contact-box {
-    border: 1px solid #4393B8; /* Azul padrão myspace */
+    border: 1px solid #4393B8;
     margin-top: 15px;
+    background: white;
 }
-.contact-header { background-color: #6699CC; color: white; font-weight: bold; padding: 3px; font-size: 12px; text-align: left; }
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; font-size: 10px; text-align: left; padding: 5px; gap: 5px; }
+.contact-header { background-color: #6699CC; color: white; font-weight: bold; padding: 4px; font-size: 12px; text-align: left; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; font-size: 11px; text-align: left; padding: 5px; gap: 5px; }
 
-/* CABEÇALHOS ESTILO MYSPACE */
+.fake-link { color: #200052; cursor: pointer; text-decoration: underline; }
+
+/* CABEÇALHOS */
 .orange-header {
-    background-color: #836EF9; /* Monad Light Purple */
+    background-color: #836EF9;
     color: #fff;
     font-weight: bold;
     font-size: 13px;
-    padding: 3px 10px;
+    padding: 4px 10px;
     margin-top: 15px;
     margin-bottom: 5px;
     text-align: left;
 }
 
-.blurb-text { font-size: 12px; line-height: 1.4; text-align: left; margin-bottom: 15px; }
+.blurb-text { font-size: 12px; line-height: 1.5; text-align: left; margin-bottom: 15px; color: #333; }
 .section-label { color: #200052; font-weight: bold; }
 
-/* TOP 8 FRIENDS */
+/* FRIEND GRID */
 .friend-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -80,10 +96,10 @@ body {
     margin-top: 10px;
 }
 .friend-card { text-align: center; font-size: 10px; }
-.friend-card img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #ccc; }
-.friend-name { display: block; margin-top: 3px; color: #200052; font-weight: bold; }
+.friend-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border: 1px solid #ccc; }
+.friend-name { display: block; margin-bottom: 3px; color: #200052; font-weight: bold; }
 
-/* INPUTS DE EDIÇÃO */
+/* MODAL */
 .edit-panel {
     position: fixed;
     top: 50%; left: 50%;
@@ -91,11 +107,12 @@ body {
     background: #f0f0f0;
     border: 3px solid #200052;
     padding: 20px;
-    width: 400px;
+    width: 90%;
+    max-width: 400px;
     z-index: 1000;
     box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
 }
-.edit-panel input, .edit-panel textarea { width: 95%; margin-bottom: 10px; padding: 5px; }
+.edit-panel input, .edit-panel textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; padding: 5px; }
 .overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999;}
 
 .btn-retro {
@@ -103,6 +120,5 @@ body {
     border: 1px solid #999;
     cursor: pointer;
     font-size: 11px;
-    padding: 2px 8px;
-    margin-top: 5px;
+    padding: 4px 10px;
 }
