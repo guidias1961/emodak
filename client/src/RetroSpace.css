@@ -1,0 +1,108 @@
+/* RESET E FUNDO */
+body {
+    background-color: #000;
+    font-family: 'Verdana', 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); /* Textura sutil */
+    color: #000;
+}
+
+/* CONTAINER PRINCIPAL */
+.master-container {
+    width: 800px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+/* NAVBAR MONAD */
+.monad-nav {
+    background-color: #200052; /* Monad Purple Dark */
+    height: 30px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    justify-content: space-between;
+    font-size: 11px;
+    color: white;
+}
+.monad-nav a { color: white; text-decoration: none; margin: 0 5px; }
+.monad-nav a:hover { text-decoration: underline; }
+
+/* LAYOUT DE COLUNAS (CSS Grid imitando Tables) */
+.content-grid {
+    display: grid;
+    grid-template-columns: 320px 480px;
+    gap: 0;
+}
+
+.left-col { padding: 15px; text-align: center; }
+.right-col { padding: 15px; }
+
+/* COMPONENTES VISUAIS */
+.profile-pic-box {
+    border: 2px solid #000;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+.profile-pic { width: 100%; max-width: 200px; }
+
+.status-text { margin: 10px 0; font-size: 12px; }
+
+.contact-box {
+    border: 1px solid #4393B8; /* Azul padrão myspace */
+    margin-top: 15px;
+}
+.contact-header { background-color: #6699CC; color: white; font-weight: bold; padding: 3px; font-size: 12px; text-align: left; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; font-size: 10px; text-align: left; padding: 5px; gap: 5px; }
+
+/* CABEÇALHOS ESTILO MYSPACE */
+.orange-header {
+    background-color: #836EF9; /* Monad Light Purple */
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 3px 10px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.blurb-text { font-size: 12px; line-height: 1.4; text-align: left; margin-bottom: 15px; }
+.section-label { color: #200052; font-weight: bold; }
+
+/* TOP 8 FRIENDS */
+.friend-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+.friend-card { text-align: center; font-size: 10px; }
+.friend-card img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #ccc; }
+.friend-name { display: block; margin-top: 3px; color: #200052; font-weight: bold; }
+
+/* INPUTS DE EDIÇÃO */
+.edit-panel {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f0f0f0;
+    border: 3px solid #200052;
+    padding: 20px;
+    width: 400px;
+    z-index: 1000;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.5);
+}
+.edit-panel input, .edit-panel textarea { width: 95%; margin-bottom: 10px; padding: 5px; }
+.overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:999;}
+
+.btn-retro {
+    background: linear-gradient(#fff, #ddd);
+    border: 1px solid #999;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-top: 5px;
+}
