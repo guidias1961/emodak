@@ -4,22 +4,28 @@ const { Pool } = require('pg');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+
+// CORREÇÃO CRUCIAL: Liberar CORS para qualquer origem (MVP)
+app.use(cors({
+    origin: '*', 
+    methods: ['GET', 'POST']
+}));
+
 app.use(express.json());
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false } // Necessário para Railway
+    ssl: { rejectUnauthorized: false }
 });
 
-// 1. Rota para Pegar Perfil (GET)
+// Rota de Teste (para saber se o back está vivo)
+app.get('/', (req, res) => res.send('Backend Emodak Online 🤘'));
+
 app.get('/api/user/:wallet', async (req, res) => {
     const { wallet } = req.params;
     try {
         const result = await pool.query('SELECT * FROM users WHERE wallet_address = $1', [wallet]);
-        
         if (result.rows.length === 0) {
-            // Cria usuário padrão se não existir (Onboarding automático)
             const newUser = await pool.query(
                 'INSERT INTO users (wallet_address) VALUES ($1) RETURNING *',
                 [wallet]
@@ -33,27 +39,18 @@ app.get('/api/user/:wallet', async (req, res) => {
     }
 });
 
-// 2. Rota para Atualizar Perfil (POST)
 app.post('/api/user', async (req, res) => {
     const { wallet_address, display_name, status, bio, avatar_url, music_url, interests } = req.body;
-    
     try {
         const query = `
             INSERT INTO users (wallet_address, display_name, status, bio, avatar_url, music_url, interests)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (wallet_address)
             DO UPDATE SET 
-                display_name = $2, 
-                status = $3, 
-                bio = $4, 
-                avatar_url = $5, 
-                music_url = $6,
-                interests = $7,
-                last_updated = CURRENT_TIMESTAMP
+                display_name = $2, status = $3, bio = $4, avatar_url = $5, music_url = $6, interests = $7
             RETURNING *;
         `;
-        const values = [wallet_address, display_name, status, bio, avatar_url, music_url, interests];
-        const result = await pool.query(query, values);
+        const result = await pool.query(query, [wallet_address, display_name, status, bio, avatar_url, music_url, interests]);
         res.json(result.rows[0]);
     } catch (err) {
         console.error(err);
@@ -62,4 +59,4 @@ app.post('/api/user', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🔪 Emodak Server stabbing on port ${PORT}`));
+app.listen(PORT, () => console.log(`🔪 Server running on ${PORT}`));

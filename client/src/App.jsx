@@ -3,219 +3,177 @@ import { ethers } from 'ethers';
 import axios from 'axios';
 import './RetroSpace.css';
 
-// Força o uso da URL do Railway se estiver em produção, senão usa localhost
-// IMPORTANTE: Não coloque barra / no final dessa string no railway variable, ou o código abaixo trata
 const ENV_URL = import.meta.env.VITE_API_URL;
 const API_URL = ENV_URL ? ENV_URL : 'http://localhost:5000/api';
-
-console.log("🔌 API URL Configurada:", API_URL); // Para debug no F12
 
 function App() {
   const [wallet, setWallet] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
   
   const [profile, setProfile] = useState({
-    display_name: 'Anonymous Emo',
-    status: 'Disconnect form reality...',
+    display_name: 'Sad Emo',
+    status: 'Waiting for connection...',
     bio: '<b>About me:</b><br>I have no soul yet.',
     avatar_url: 'https://placehold.co/400x400/200052/FFF?text=Sad+Emo',
     interests: 'Crypto, Monad, Tears',
     music_url: ''
   });
-
   const [formData, setFormData] = useState({});
 
-  // 1. Conectar Carteira com DEBUG
-  const connectWallet = async () => {
-    setIsLoading(true);
-    try {
-      if (!window.ethereum) {
-        alert("ERRO: Nenhuma carteira detectada! Instale a Rabby ou MetaMask.");
-        setIsLoading(false);
-        return;
-      }
+  // Verifica se já conectou antes ao carregar a página
+  useEffect(() => {
+    checkConnection();
+  }, []);
 
-      // Solicita conexão
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      
-      console.log("✅ Carteira conectada:", address);
-      setWallet(address);
-      
-      // Busca perfil
-      await loadProfile(address);
-      
-    } catch (error) {
-      console.error("❌ Erro ao conectar:", error);
-      alert(`Erro ao conectar: ${error.message}`);
-    } finally {
-      setIsLoading(false);
+  const checkConnection = async () => {
+    if (window.ethereum) {
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const accounts = await provider.listAccounts();
+            if (accounts.length > 0) {
+                const address = await accounts[0].getAddress();
+                setWallet(address);
+                loadProfile(address);
+            }
+        } catch (e) { console.log("Não conectado automaticamente"); }
     }
   };
 
-  // 2. Carregar Perfil
+  const connectWallet = async () => {
+    setIsLoading(true);
+    setStatusMsg('Check your wallet...');
+    
+    try {
+      if (!window.ethereum) throw new Error("No wallet found. Install Rabby/Metamask.");
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      // Pede permissão explícita
+      const signer = await provider.getSigner();
+      const address = await signer.getAddress();
+      
+      setWallet(address);
+      setStatusMsg('Loading profile...');
+      await loadProfile(address);
+      
+    } catch (error) {
+      console.error(error);
+      alert("Connection failed: " + error.message);
+    } finally {
+      setIsLoading(false);
+      setStatusMsg('');
+    }
+  };
+
   const loadProfile = async (addr) => {
     try {
-      console.log(`📡 Buscando dados em: ${API_URL}/user/${addr}`);
-      const res = await axios.get(`${API_URL}/user/${addr}`);
-      
-      // Se tiver dados, atualiza. Se for novo, usa o padrão misturado com o retorno
+      // Adiciona timestamp para evitar cache do navegador
+      const res = await axios.get(`${API_URL}/user/${addr}?t=${Date.now()}`);
       if(res.data) {
          setProfile(prev => ({...prev, ...res.data}));
          setFormData(prev => ({...prev, ...res.data}));
       }
     } catch (e) { 
-      console.error("❌ Erro na API:", e);
-      // Não alerta o usuário para não assustar, mas loga no console
+      console.error("API Error:", e); 
+      // Não trava a UI se a API falhar, só loga
     }
   };
 
-  // 3. Salvar
   const handleSave = async () => {
+    if(!wallet) return;
     try {
       const payload = { ...formData, wallet_address: wallet };
       const res = await axios.post(`${API_URL}/user`, payload);
       setProfile(res.data);
       setIsEditing(false);
-      alert("Profile updated... whatever.");
-    } catch (e) { 
-      alert("Failed to save. Server might be sleeping.");
-      console.error(e);
-    }
+    } catch (e) { alert("Save failed."); }
   };
 
   return (
     <div className="master-container">
-      {/* --- NAVBAR --- */}
       <div className="monad-nav">
-        <div style={{display:'flex', alignItems:'center', gap:'5px'}}>
-             {/* Certifique-se que emodak-logo.png está na pasta public */}
-             <span style={{fontSize:'14px'}}>💜 <b>EMODAK SPACE</b></span>
+        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+             <span style={{fontSize:'18px', fontWeight:'bold'}}>💜 EMODAK SPACE</span>
         </div>
         <div>
             {wallet ? 
-                <span style={{color:'#ccc'}}>Logged: {wallet.substring(0,6)}...</span> : 
-                <button onClick={connectWallet} style={{cursor:'pointer'}}>
-                    {isLoading ? 'Connecting...' : '[ Connect Wallet ]'}
+                <span style={{color:'#fff', fontWeight:'bold'}}>USER: {wallet.substring(0,6)}...</span> : 
+                <button onClick={connectWallet} disabled={isLoading} style={{padding:'5px 15px', cursor:'pointer', background:'white', border:'none', fontWeight:'bold'}}>
+                    {isLoading ? statusMsg || 'Connecting...' : '[ CONNECT WALLET ]'}
                 </button>
             }
         </div>
       </div>
 
       <div className="content-grid">
-        {/* --- COLUNA ESQUERDA --- */}
+        {/* COLUNA ESQUERDA */}
         <div className="left-col">
-          <h2 style={{margin:'0 0 10px 0', fontSize:'18px'}}>{profile.display_name}</h2>
+          <h2 style={{marginTop:0}}>{profile.display_name}</h2>
           
           <div className="profile-pic-box">
-             {/* Fallback para imagem se a URL quebrar */}
-             <img 
-                src={profile.avatar_url} 
-                onError={(e) => {e.target.src='https://placehold.co/400x400/000/FFF?text=Image+Error'}}
-                className="profile-pic" 
-                alt="avatar" 
-             />
+             <img src={profile.avatar_url} onError={(e)=>{e.target.src='https://placehold.co/400?text=Error'}} className="profile-pic" />
           </div>
 
           <div className="status-text">
              "{profile.status}"<br/>
-             <span style={{color:'green', fontSize:'10px'}}>● Online</span>
+             <span style={{color:'green', fontSize:'12px'}}>● Online</span>
           </div>
 
           <div className="contact-box">
              <div className="contact-header">Contacting {profile.display_name}</div>
              <div className="contact-grid">
-                <span className="fake-link">Message</span> <span className="fake-link">Forward</span>
-                <span className="fake-link">Add Friend</span> <span className="fake-link">Block</span>
+                <span className="fake-link">Message</span> <span className="fake-link">Add Friend</span>
              </div>
           </div>
-
-          <div className="contact-box">
-             <div className="contact-header">MySpace URL</div>
-             <div style={{padding:'5px', fontSize:'10px', wordBreak:'break-all'}}>
-                myspace.com/{wallet ? wallet.substring(0,6) : 'guest'}
-             </div>
+          
+          <div className="contact-box" style={{marginTop:'10px'}}>
+             <div className="contact-header">Url</div>
+             <div style={{padding:'5px', fontSize:'11px'}}>myspace.com/{wallet ? wallet.substring(0,8) : 'guest'}</div>
           </div>
         </div>
 
-        {/* --- COLUNA DIREITA --- */}
+        {/* COLUNA DIREITA */}
         <div className="right-col">
-           <div style={{border:'1px solid #ccc', padding:'10px', background:'white', marginBottom:'10px'}}>
+           <div style={{border:'1px solid #ccc', padding:'15px', background:'white', marginBottom:'20px', boxShadow:'2px 2px 5px #eee'}}>
               <b>{profile.display_name}</b> is in your extended network.
            </div>
 
            {wallet && (
                <div style={{textAlign:'right'}}>
-                   <button className="btn-retro" onClick={() => setIsEditing(true)}>Edit Profile</button>
+                   <button onClick={() => setIsEditing(true)} style={{background:'#200052', color:'white', border:'none', padding:'8px 15px', cursor:'pointer'}}>Edit Profile</button>
                </div>
            )}
 
-           <div className="orange-header">{profile.display_name}'s Interests</div>
-           <div className="blurb-text">
-               <span className="section-label">General:</span> {profile.interests}
-           </div>
+           <div className="orange-header">Interests</div>
+           <div className="blurb-text">{profile.interests}</div>
 
-           <div className="orange-header">{profile.display_name}'s Details</div>
-           <div className="blurb-text">
-               <span className="section-label">About me:</span>
-               <div dangerouslySetInnerHTML={{__html: profile.bio}} /> 
-           </div>
+           <div className="orange-header">About Me</div>
+           <div className="blurb-text" dangerouslySetInnerHTML={{__html: profile.bio}} />
 
-           <div className="orange-header">{profile.display_name}'s Friend Space</div>
-           <div className="blurb-text">
-               <b>{profile.display_name} has 666 friends.</b>
-               
-               <div className="friend-grid">
-                   {/* Placeholders seguros que não quebram */}
-                   <div className="friend-card">
-                       <span className="friend-name">Tom</span>
-                       <img src="https://placehold.co/100/200052/FFF?text=Tom" />
+           <div className="orange-header">Friend Space</div>
+           <div className="friend-grid">
+               {[1,2,3,4,5,6,7,8].map(i => (
+                   <div key={i} className="friend-card">
+                       <img src={`https://placehold.co/150/200052/FFF?text=Friend+${i}`} />
+                       <span style={{display:'block', marginTop:'5px', fontWeight:'bold', color:'#200052'}}>Emo {i}</span>
                    </div>
-                   <div className="friend-card">
-                       <span className="friend-name">Keone</span>
-                       <img src="https://placehold.co/100/200052/FFF?text=Keone" />
-                   </div>
-                   <div className="friend-card">
-                       <span className="friend-name">Vitalik</span>
-                       <img src="https://placehold.co/100/200052/FFF?text=Vitalik" />
-                   </div>
-                   <div className="friend-card">
-                       <span className="friend-name">Pepe</span>
-                       <img src="https://placehold.co/100/200052/FFF?text=Pepe" />
-                   </div>
-               </div>
+               ))}
            </div>
         </div>
       </div>
 
-      {/* --- MODAL DE EDIÇÃO --- */}
       {isEditing && (
         <>
             <div className="overlay" onClick={() => setIsEditing(false)}></div>
             <div className="edit-panel">
-                <h3 style={{marginTop:0}}>Edit Your Persona</h3>
-                
-                <label>Display Name:</label>
-                <input value={formData.display_name || ''} onChange={e=>setFormData({...formData, display_name: e.target.value})} />
-                
-                <label>Status:</label>
-                <input value={formData.status || ''} onChange={e=>setFormData({...formData, status: e.target.value})} />
-                
-                <label>Avatar URL (Imgur/Link):</label>
-                <input value={formData.avatar_url || ''} onChange={e=>setFormData({...formData, avatar_url: e.target.value})} />
-
-                <label>Interests:</label>
-                <input value={formData.interests || ''} onChange={e=>setFormData({...formData, interests: e.target.value})} />
-                
-                <label>Bio (HTML allowed):</label>
-                <textarea rows="4" value={formData.bio || ''} onChange={e=>setFormData({...formData, bio: e.target.value})} />
-
-                <div style={{display:'flex', gap:'10px', marginTop:'10px'}}>
-                    <button className="btn-retro" style={{fontWeight:'bold'}} onClick={handleSave}>Save Changes</button>
-                    <button className="btn-retro" onClick={() => setIsEditing(false)}>Cancel</button>
-                </div>
+                <h3>Edit Profile</h3>
+                <input placeholder="Name" value={formData.display_name || ''} onChange={e=>setFormData({...formData, display_name: e.target.value})} />
+                <input placeholder="Status" value={formData.status || ''} onChange={e=>setFormData({...formData, status: e.target.value})} />
+                <input placeholder="Avatar URL" value={formData.avatar_url || ''} onChange={e=>setFormData({...formData, avatar_url: e.target.value})} />
+                <input placeholder="Interests" value={formData.interests || ''} onChange={e=>setFormData({...formData, interests: e.target.value})} />
+                <textarea rows="5" placeholder="Bio" value={formData.bio || ''} onChange={e=>setFormData({...formData, bio: e.target.value})} />
+                <button onClick={handleSave} style={{background:'#200052', color:'white', padding:'10px', border:'none', width:'100%'}}>SAVE CHANGES</button>
             </div>
         </>
       )}
